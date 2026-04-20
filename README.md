@@ -4,4 +4,5 @@ Implementing Checkers Using OOP Concepts
 Members:
 Xyrex T. Antallan\
 Lance Christian E. Aropo\
-Jose Alejandro C. Mata
+Jose Alejandro C. Mata\
+Paolo Ricci A. Manugas
