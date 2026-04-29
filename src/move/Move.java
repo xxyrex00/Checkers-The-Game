@@ -1,23 +1,46 @@
 package move;
 
+import board.Position;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Move {
 
-    // Attributes:
-    // - Position start
-    // - Position end
-    // - List<Position> capturedPieces
+    private Position start;
+    private Position end;
+    private List<Position> capturedPieces;
 
-    // Constructor to initialize move
+    public Move(Position start, Position end) {
+        this.start = start;
+        this.end = end;
+        this.capturedPieces = new ArrayList<>();
+    }
 
-    // Getter for start position
+    public Move(Position start, Position end, List<Position> capturedPieces) {
+        this.start = start;
+        this.end = end;
+        this.capturedPieces = capturedPieces != null ? capturedPieces : new ArrayList<>();
+    }
 
-    // Getter for end position
+    public Position getStart() {
+        return start;
+    }
 
-    // Getter for captured pieces
+    public Position getEnd() {
+        return end;
+    }
 
-    // Method to check if move is a capture move
+    public List<Position> getCapturedPieces() {
+        return capturedPieces;
+    }
 
-    // Optional: toString() for debugging
+    public boolean isCaptureMove() {
+        return !capturedPieces.isEmpty();
+    }
+
+    @Override
+    public String toString() {
+        return start + " -> " + end + (isCaptureMove() ? " [captures: " + capturedPieces + "]" : "");
+    }
 }
