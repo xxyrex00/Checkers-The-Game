@@ -1,6 +1,7 @@
-public enum GameState {
+package game;
 
-    // ONGOING
-    // WHITE_WIN
-    // BLACK_WIN
+public enum GameState {
+    ONGOING,
+    WHITE_WIN,
+    BLACK_WIN
 }
