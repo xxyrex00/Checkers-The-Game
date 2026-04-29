@@ -1,20 +1,46 @@
 package player;
 
+import board.Board;
+import move.Move;
+import move.MoveGenerator;
+
 import java.util.List;
 import java.util.Random;
 
 public class BotPlayer extends Player {
 
-    // Attribute:
-    // - MoveGenerator moveGenerator
+    private MoveGenerator moveGenerator;
+    private Random random;
 
-    // Constructor
+    public BotPlayer(String name, String color) {
+        super(name, color);
+        this.moveGenerator = new MoveGenerator();
+        this.random = new Random();
+    }
 
-    // Implement makeMove():
-    // 1. Get capture moves
-    // 2. If not empty → pick random capture
-    // 3. Else → get all moves → pick random
+    @Override
+    public Move makeMove(Board board) {
+        List<Move> captures = moveGenerator.getCaptureMoves(board, getColor());
+        if (!captures.isEmpty()) {
+            return pickRandom(captures);
+        }
 
-    // Helper method:
-    // - pick random move from list
+        List<Move> allMoves = moveGenerator.getAllMoves(board, getColor());
+        if (!allMoves.isEmpty()) {
+            return pickRandom(allMoves);
+        }
+        return null;
+    }
+
+    private Move pickRandom(List<Move> moves) {
+        return moves.get(random.nextInt(moves.size()));
+    }
+
+    public MoveGenerator getMoveGenerator() {
+        return moveGenerator;
+    }
+
+    public Random getRandom() {
+        return random;
+    }
 }

@@ -1,15 +1,25 @@
 package player;
 
+import board.Board;
+import move.Move;
+
 public abstract class Player {
 
-    // Attributes:
-    // - String name
-    // - String color
+    private String name;
+    private String color;
 
-    // Constructor
+    public Player(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
 
-    // Getter methods
+    public String getName() {
+        return name;
+    }
 
-    // Abstract method:
-    // - makeMove(Board board)
+    public String getColor() {
+        return color;
+    }
+
+    public abstract Move makeMove(Board board);
 }

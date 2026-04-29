@@ -1,10 +1,17 @@
 package player;
 
+import board.Board;
+import move.Move;
+
 public class HumanPlayer extends Player {
 
-    // Constructor
+    public HumanPlayer(String name, String color) {
+        super(name, color);
+    }
 
-    // Implement makeMove():
-    // - Wait for input (GUI or console)
-    // - Return selected move
+    @Override
+    public Move makeMove(Board board) {
+        // Input is handled by the GUI/console layer
+        return null;
+    }
 }
