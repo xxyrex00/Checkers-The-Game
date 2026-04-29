@@ -1,31 +1,42 @@
 package game;
 
+import board.Board;
+import move.Move;
+import move.MoveGenerator;
+import pieces.Piece;
+
 import java.util.List;
 
 public class RuleEngine {
 
-    // Method to get valid moves (enforcing rules)
-    // - If capture moves exist → return only capture moves
-    // - Else → return normal moves
+    private MoveGenerator moveGenerator;
+
+    public RuleEngine() {
+        this.moveGenerator = new MoveGenerator();
+    }
 
     public List<Move> getValidMoves(Board board, String playerColor) {
-        // TODO: use MoveGenerator
-        return null;
+        List<Move> captures = moveGenerator.getCaptureMoves(board, playerColor);
+        if (!captures.isEmpty()) {
+            return captures;
+        }
+        return moveGenerator.getAllMoves(board, playerColor);
     }
-
-    // Method to enforce multi-capture
-    // - After a capture, check if another capture is possible
 
     public boolean hasMoreCaptures(Board board, Piece piece) {
-        // TODO: implement
-        return false;
+        List<Move> moreCaps = moveGenerator.getCaptureMovesForPiece(board, piece);
+        return !moreCaps.isEmpty();
     }
 
-    // Method to check win condition
-    // - No pieces left OR no valid moves
-
     public boolean checkWinCondition(Board board, String playerColor) {
-        // TODO: implement
-        return false;
+        List<Piece> opponentPieces = board.getPiecesOf(getOpponentColor(playerColor));
+        if (opponentPieces.isEmpty()) return true;
+
+        List<Move> opponentMoves = getValidMoves(board, getOpponentColor(playerColor));
+        return opponentMoves.isEmpty();
+    }
+
+    public String getOpponentColor(String color) {
+        return color.equals("WHITE") ? "BLACK" : "WHITE";
     }
 }
