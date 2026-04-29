@@ -2,15 +2,37 @@ package board;
 
 public class Position {
 
-    // Attributes:
-    // - row (int)
-    // - col (int)
+    private int row;
+    private int col;
 
-    // Constructor to initialize row and col
+    public Position(int row, int col) {
+        this.row = row;
+        this.col = col;
+    }
 
-    // Getter methods for row and col
+    public int getRow() {
+        return row;
+    }
 
-    // Override equals() to compare positions
+    public int getCol() {
+        return col;
+    }
 
-    // Optional: toString() for debugging
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Position)) return false;
+        Position other = (Position) obj;
+        return this.row == other.row && this.col == other.col;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * row + col;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + row + ", " + col + ")";
+    }
 }

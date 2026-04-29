@@ -1,23 +1,40 @@
 package board;
 
+import pieces.Piece;
+
 public class Tile {
 
-    // Attributes:
-    // - Position position
-    // - Piece piece (can be null)
-    // - boolean isPlayable (dark square)
+    private Position position;
+    private Piece piece;
+    private boolean isPlayable;
 
-    // Constructor to initialize tile
+    public Tile(Position position, boolean isPlayable) {
+        this.position = position;
+        this.isPlayable = isPlayable;
+        this.piece = null;
+    }
 
-    // Method to check if tile is occupied
+    public boolean isOccupied() {
+        return piece != null;
+    }
 
-    // Method to set a piece on the tile
+    public void setPiece(Piece piece) {
+        this.piece = piece;
+    }
 
-    // Method to remove a piece
+    public void removePiece() {
+        this.piece = null;
+    }
 
-    // Getter for piece
+    public Piece getPiece() {
+        return piece;
+    }
 
-    // Getter for position
+    public Position getPosition() {
+        return position;
+    }
 
-    // Getter for isPlayable
+    public boolean isPlayable() {
+        return isPlayable;
+    }
 }
