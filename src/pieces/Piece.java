@@ -1,22 +1,36 @@
 package pieces;
 
+import board.Board;
+import board.Position;
+import move.Move;
+
+import java.util.List;
+
 public abstract class Piece {
 
-    // Attributes:
-    // - String color (e.g., "WHITE", "BLACK")
-    // - Position position
+    private String color;
+    private Position position;
 
-    // Constructor to initialize color and position
+    public Piece(String color, Position position) {
+        this.color = color;
+        this.position = position;
+    }
 
-    // Getter for color
+    public String getColor() {
+        return color;
+    }
 
-    // Getter for position
+    public Position getPosition() {
+        return position;
+    }
 
-    // Setter for position (used when moving)
+    public void setPosition(Position position) {
+        this.position = position;
+    }
 
-    // Abstract method:
-    // - getPossibleMoves(Board board)
+    // Returns all possible non-capture moves
+    public abstract List<Move> getPossibleMoves(Board board);
 
-    // Abstract method:
-    // - getCaptureMoves(Board board)
+    // Returns all capture moves
+    public abstract List<Move> getCaptureMoves(Board board);
 }
