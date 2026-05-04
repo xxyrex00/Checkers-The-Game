@@ -10,7 +10,7 @@ import java.util.List;
 
 public class King extends Piece {
 
-    public King(String color, Position position) {
+    public King(Color color, Position position) {
         super(color, position);
     }
 
@@ -53,7 +53,7 @@ public class King extends Piece {
                 Tile tile = board.getTile(curr);
 
                 if (tile.isOccupied()) {
-                    if (tile.getPiece().getColor().equals(getColor())) break; // own piece blocks
+                    if (tile.getPiece().getColor() == getColor()) break; // own piece blocks
                     if (enemyPos != null) break; // second enemy piece, can't jump two
                     enemyPos = curr;
                 } else if (enemyPos != null) {
@@ -69,3 +69,4 @@ public class King extends Piece {
         return captures;
     }
 }
+
