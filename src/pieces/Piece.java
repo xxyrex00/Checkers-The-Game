@@ -8,15 +8,15 @@ import java.util.List;
 
 public abstract class Piece {
 
-    private String color;
+    private Color color;
     private Position position;
 
-    public Piece(String color, Position position) {
+    public Piece(Color color, Position position) {
         this.color = color;
         this.position = position;
     }
 
-    public String getColor() {
+    public Color getColor() {
         return color;
     }
 
