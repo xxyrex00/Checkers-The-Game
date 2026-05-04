@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Man extends Piece {
 
-    public Man(String color, Position position) {
+    public Man(Color color, Position position) {
         super(color, position);
     }
 
@@ -20,7 +20,7 @@ public class Man extends Piece {
         List<Move> moves = new ArrayList<>();
         int row = getPosition().getRow();
         int col = getPosition().getCol();
-        int direction = getColor().equals("WHITE") ? -1 : 1;
+        int direction = getColor() == Color.WHITE ? -1 : 1;
 
         int[][] forwardDiagonals = {{direction, -1}, {direction, 1}};
         for (int[] d : forwardDiagonals) {
@@ -46,7 +46,7 @@ public class Man extends Piece {
 
             if (!board.isWithinBounds(enemyPos) || !board.isWithinBounds(landPos)) continue;
             if (!board.getTile(enemyPos).isOccupied()) continue;
-            if (board.getTile(enemyPos).getPiece().getColor().equals(getColor())) continue;
+            if (board.getTile(enemyPos).getPiece().getColor() == getColor()) continue;
             if (board.getTile(landPos).isOccupied()) continue;
 
             List<Position> captured = new ArrayList<>();
@@ -59,7 +59,8 @@ public class Man extends Piece {
     // Check if this Man should be promoted (reaches the opposite back row)
     public boolean shouldPromote() {
         int row = getPosition().getRow();
-        return (getColor().equals("WHITE") && row == 0) ||
-               (getColor().equals("BLACK") && row == Board.SIZE - 1);
+        return (getColor() == Color.WHITE && row == 0) ||
+               (getColor() == Color.BLACK && row == Board.SIZE - 1);
     }
 }
+
