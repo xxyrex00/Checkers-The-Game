@@ -1,5 +1,6 @@
 package board;
 
+import pieces.Color;
 import pieces.Man;
 import pieces.Piece;
 import move.Move;
@@ -36,10 +37,10 @@ public class Board {
             for (int col = 0; col < SIZE; col++) {
                 if (!tiles[row][col].isPlayable()) continue;
                 if (row <= 3) {
-                    Man man = new Man("BLACK", new Position(row, col));
+                    Man man = new Man(Color.BLACK, new Position(row, col));
                     tiles[row][col].setPiece(man);
                 } else if (row >= 6) {
-                    Man man = new Man("WHITE", new Position(row, col));
+                    Man man = new Man(Color.WHITE, new Position(row, col));
                     tiles[row][col].setPiece(man);
                 }
             }
@@ -80,12 +81,12 @@ public class Board {
     }
 
     // Return all pieces belonging to a given player color
-    public List<Piece> getPiecesOf(String color) {
+    public List<Piece> getPiecesOf(Color color) {
         List<Piece> pieces = new ArrayList<>();
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
                 Tile tile = tiles[row][col];
-                if (tile.isOccupied() && tile.getPiece().getColor().equals(color)) {
+                if (tile.isOccupied() && tile.getPiece().getColor() == color) {
                     pieces.add(tile.getPiece());
                 }
             }
@@ -106,7 +107,7 @@ public class Board {
                     System.out.print("_ ");
                 } else {
                     Piece p = tile.getPiece();
-                    String symbol = p.getColor().equals("WHITE") ? "W" : "B";
+                    String symbol = p.getColor() == Color.WHITE ? "W" : "B";
                     if (p instanceof pieces.King) symbol = symbol.toLowerCase();
                     System.out.print(symbol + " ");
                 }
@@ -115,3 +116,4 @@ public class Board {
         }
     }
 }
+
