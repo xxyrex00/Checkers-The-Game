@@ -2,13 +2,14 @@ package player;
 
 import board.Board;
 import move.Move;
+import pieces.Color;
 
 public abstract class Player {
 
     private String name;
-    private String color;
+    private Color color;
 
-    public Player(String name, String color) {
+    public Player(String name, Color color) {
         this.name = name;
         this.color = color;
     }
@@ -17,7 +18,7 @@ public abstract class Player {
         return name;
     }
 
-    public String getColor() {
+    public Color getColor() {
         return color;
     }
 
