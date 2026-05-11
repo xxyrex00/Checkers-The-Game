@@ -1,6 +1,7 @@
 package move;
 
 import board.Board;
+import pieces.Color;
 import pieces.Piece;
 
 import java.util.ArrayList;
@@ -8,17 +9,17 @@ import java.util.List;
 
 public class MoveGenerator {
 
-    public List<Move> getAllMoves(Board board, String playerColor) {
+    public List<Move> getAllMoves(Board board, Color playerColor) {
         List<Move> allMoves = new ArrayList<>();
         List<Piece> pieces = board.getPiecesOf(playerColor);
         for (Piece piece : pieces) {
             allMoves.addAll(piece.getPossibleMoves(board));
-            allMoves.addAll(piece.getCaptureMoves(board));
+           
         }
         return allMoves;
     }
 
-    public List<Move> getCaptureMoves(Board board, String playerColor) {
+    public List<Move> getCaptureMoves(Board board, Color playerColor) {
         List<Move> captureMoves = new ArrayList<>();
         List<Piece> pieces = board.getPiecesOf(playerColor);
         for (Piece piece : pieces) {
