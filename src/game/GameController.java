@@ -2,8 +2,8 @@ package game;
 
 import board.Board;
 import board.Position;
-import board.Tile;
 import move.Move;
+import pieces.Color;
 import pieces.King;
 import pieces.Man;
 import pieces.Piece;
@@ -32,11 +32,11 @@ public class GameController {
         this.gameState = GameState.ONGOING;
         this.forcedPiece = null;
 
-        playerWhite = new HumanPlayer("Player 1", "WHITE");
+        playerWhite = new HumanPlayer("Player 1", Color.WHITE);
         if (gameMode == GameMode.PVP) {
-            playerBlack = new HumanPlayer("Player 2", "BLACK");
+            playerBlack = new HumanPlayer("Player 2", Color.BLACK);
         } else {
-            playerBlack = new BotPlayer("Bot", "BLACK");
+            playerBlack = new BotPlayer("Bot", Color.BLACK);
         }
         currentPlayer = playerWhite;
     }
@@ -64,23 +64,22 @@ public class GameController {
             return;
         }
 
-        Piece movingPiece = board.getTile(fullMove.getStart()).getPiece();
         board.movePiece(fullMove);
-
         Piece pieceAtEnd = board.getTile(fullMove.getEnd()).getPiece();
-        pieceAtEnd = promoteIfEligible(pieceAtEnd);
 
         board.printBoard();
-
-        if (ruleEngine.checkWinCondition(board, currentPlayer.getColor())) {
-            gameState = currentPlayer.getColor().equals("WHITE") ? GameState.WHITE_WIN : GameState.BLACK_WIN;
-            System.out.println(currentPlayer.getName() + " wins!");
-            return;
-        }
 
         if (fullMove.isCaptureMove() && ruleEngine.hasMoreCaptures(board, pieceAtEnd)) {
             forcedPiece = pieceAtEnd;
             System.out.println("Multi-capture! " + currentPlayer.getName() + " must continue capturing with same piece.");
+            return;
+        }
+
+        pieceAtEnd = promoteIfEligible(pieceAtEnd);
+
+        if (ruleEngine.checkWinCondition(board, currentPlayer.getColor())) {
+            gameState = currentPlayer.getColor() == Color.WHITE ? GameState.WHITE_WIN : GameState.BLACK_WIN;
+            System.out.println(currentPlayer.getName() + " wins!");
             return;
         }
 
@@ -118,5 +117,5 @@ public class GameController {
     public RuleEngine getRuleEngine() { return ruleEngine; }
     public MoveValidator getMoveValidator() { return moveValidator; }
     public Piece getForcedPiece() { return forcedPiece; }
-    public Player getPlayerBlack() { return playerBlack; }   // added for Main to reuse bot
+    public Player getPlayerBlack() { return playerBlack; }
 }
