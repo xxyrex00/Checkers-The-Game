@@ -2,13 +2,14 @@ import game.GameController;
 import game.GameMode;
 import game.GameState;
 import move.Move;
+import pieces.Color;
 import player.BotPlayer;
-import pieces.Piece;
 
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+
+    private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         System.out.println("=== International Checkers (10x10) ===\n");
@@ -28,7 +29,6 @@ public class Main {
     }
 
     private static GameMode selectGameMode() {
-        Scanner scanner = new Scanner(System.in);
         System.out.println("Select Game Mode:");
         System.out.println("  1. Player vs Player");
         System.out.println("  2. Player vs Bot");
@@ -50,8 +50,6 @@ public class Main {
     }
 
     private static void runPlayerVsPlayer(GameController game) {
-        Scanner scanner = new Scanner(System.in);
-
         while (game.getGameState() == GameState.ONGOING) {
             if (game.getForcedPiece() != null) {
                 System.out.println("*** Forced continuation: you must capture again with the piece at " +
@@ -71,20 +69,14 @@ public class Main {
     }
 
     private static void runPlayerVsBot(GameController game) {
-        Scanner scanner = new Scanner(System.in);
-        BotPlayer bot = (BotPlayer) game.getPlayerBlack(); // reuse the bot from GameController
+        BotPlayer bot = (BotPlayer) game.getPlayerBlack();
 
         while (game.getGameState() == GameState.ONGOING) {
-            if (game.getCurrentPlayer().getColor().equals("BLACK")) {
-                // Bot's turn
-                Move move = null;
-                Piece forcedPiece = game.getForcedPiece();
-                if (forcedPiece != null) {
-                    List<Move> forcedCaps = bot.getMoveGenerator().getCaptureMovesForPiece(game.getBoard(), forcedPiece);
-                    if (!forcedCaps.isEmpty()) {
-                        move = forcedCaps.get(bot.getRandom().nextInt(forcedCaps.size()));
-                        System.out.println("Bot forced capture with piece at " + forcedPiece.getPosition());
-                    }
+            if (game.getCurrentPlayer().getColor() == Color.BLACK) {
+                Move move;
+                if (game.getForcedPiece() != null) {
+                    move = bot.makeForcedCapture(game.getBoard(), game.getForcedPiece());
+                    System.out.println("Bot forced capture with piece at " + game.getForcedPiece().getPosition());
                 } else {
                     move = bot.makeMove(game.getBoard());
                 }
