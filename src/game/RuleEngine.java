@@ -3,6 +3,7 @@ package game;
 import board.Board;
 import move.Move;
 import move.MoveGenerator;
+import pieces.Color;
 import pieces.Piece;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public class RuleEngine {
         this.moveGenerator = new MoveGenerator();
     }
 
-    public List<Move> getValidMoves(Board board, String playerColor) {
+    public List<Move> getValidMoves(Board board, Color playerColor) {
         List<Move> captures = moveGenerator.getCaptureMoves(board, playerColor);
         if (!captures.isEmpty()) {
             return captures;
@@ -28,15 +29,16 @@ public class RuleEngine {
         return !moreCaps.isEmpty();
     }
 
-    public boolean checkWinCondition(Board board, String playerColor) {
-        List<Piece> opponentPieces = board.getPiecesOf(getOpponentColor(playerColor));
+    public boolean checkWinCondition(Board board, Color currentPlayerColor) {
+        Color opponentColor = currentPlayerColor.opponent();
+        List<Piece> opponentPieces = board.getPiecesOf(opponentColor);
         if (opponentPieces.isEmpty()) return true;
 
-        List<Move> opponentMoves = getValidMoves(board, getOpponentColor(playerColor));
+        List<Move> opponentMoves = getValidMoves(board, opponentColor);
         return opponentMoves.isEmpty();
     }
 
-    public String getOpponentColor(String color) {
-        return color.equals("WHITE") ? "BLACK" : "WHITE";
+    public Color getOpponentColor(Color color) {
+        return color.opponent();
     }
 }

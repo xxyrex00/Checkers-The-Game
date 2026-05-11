@@ -2,6 +2,7 @@ package game;
 
 import board.Board;
 import move.Move;
+import pieces.Color;
 
 import java.util.List;
 
@@ -13,13 +14,13 @@ public class MoveValidator {
         this.ruleEngine = ruleEngine;
     }
 
-    public Move validateMove(Board board, Move attemptedMove, String playerColor) {
+    public Move validateMove(Board board, Move attemptedMove, Color playerColor) {
         if (attemptedMove == null) return null;
         if (!board.isWithinBounds(attemptedMove.getStart()) || !board.isWithinBounds(attemptedMove.getEnd()))
             return null;
 
         if (!board.getTile(attemptedMove.getStart()).isOccupied()) return null;
-        if (!board.getTile(attemptedMove.getStart()).getPiece().getColor().equals(playerColor))
+        if (board.getTile(attemptedMove.getStart()).getPiece().getColor() != playerColor)
             return null;
 
         List<Move> validMoves = ruleEngine.getValidMoves(board, playerColor);
