@@ -1,6 +1,6 @@
-import game.GameController;
 import game.GameMode;
 import game.GameState;
+import game.core.GameController;
 import move.Move;
 import pieces.Color;
 import player.BotPlayer;

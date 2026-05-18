@@ -1,7 +1,11 @@
-package game;
+package game.core;
 
 import board.Board;
 import board.Position;
+import game.GameMode;
+import game.GameState;
+import game.rules.MoveValidator;
+import game.rules.RuleEngine;
 import move.Move;
 import pieces.Color;
 import pieces.King;

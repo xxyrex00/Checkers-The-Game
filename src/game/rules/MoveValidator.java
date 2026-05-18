@@ -1,4 +1,4 @@
-package game;
+package game.rules;
 
 import board.Board;
 import move.Move;
