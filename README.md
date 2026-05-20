@@ -5,6 +5,6 @@ Members:
 Xyrex T. Antallan\
 Lance Christian E. Aropo\
 Jose Alejandro C. Mata\
-Paolo Ricci A. Manugas
+Paolo Ricci A. Manugas\
 
-![plot](Class Diagram.png)
+![Class Diagram](images/ClassDiagram.png)
