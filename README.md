@@ -8,3 +8,5 @@ Jose Alejandro C. Mata\
 Paolo Ricci A. Manugas\
 
 ![Class Diagram](images/ClassDiagram.png)
+
+![Use Case Diagram](images/UseCaseDiagram.png)
