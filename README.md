@@ -36,8 +36,3 @@ This project is an implementation of **International Checkers** (also known as *
 - Lance Christian E. Aropo
 - Jose Alejandro C. Mata
 - Paolo Ricci A. Manugas
-
-
-
-
-![Use Case Diagram](images/UseCaseDiagram.png)
