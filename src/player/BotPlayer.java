@@ -2,7 +2,7 @@ package player;
 
 import board.Board;
 import move.Move;
-import move.MoveGenerator;
+import game.rules.RuleEngine;
 import pieces.Color;
 
 import java.util.List;
@@ -10,25 +10,19 @@ import java.util.Random;
 
 public class BotPlayer extends Player {
 
-    private MoveGenerator moveGenerator;
+    private RuleEngine ruleEngine;
     private Random random;
 
-    public BotPlayer(String name, Color color) {
+    public BotPlayer(String name, Color color, RuleEngine ruleEngine) {
         super(name, color);
-        this.moveGenerator = new MoveGenerator();
+        this.ruleEngine = ruleEngine;
         this.random = new Random();
     }
 
-    @Override
     public Move makeMove(Board board) {
-        List<Move> captures = moveGenerator.getCaptureMoves(board, getColor());
-        if (!captures.isEmpty()) {
-            return pickRandom(captures);
-        }
-
-        List<Move> allMoves = moveGenerator.getAllMoves(board, getColor());
-        if (!allMoves.isEmpty()) {
-            return pickRandom(allMoves);
+        List<Move> moves = ruleEngine.getValidMoves(board, getColor());
+        if (!moves.isEmpty()) {
+            return pickRandom(moves);
         }
         return null;
     }
