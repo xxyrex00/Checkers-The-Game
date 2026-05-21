@@ -1,5 +1,227 @@
 package gui;
 
-public class CheckersWindow {
-    
+import board.Position;
+import game.GameMode;
+import game.GameState;
+import game.core.GameController;
+import gui.dialogs.ModeDialog;
+import gui.panels.BoardPanel;
+import gui.panels.SidePanel;
+import move.Move;
+import player.BotPlayer;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class CheckersWindow extends JFrame {
+
+    private GameController game;
+    private BoardPanel boardPanel;
+    private SidePanel sidePanel;
+    private GameMode mode;
+
+    private Position selectedPos = null;
+
+    public CheckersWindow(GameMode mode) {
+        this.mode = mode;
+        initGame(mode);
+        buildUI();
+        setupInteraction();
+        refreshAll();
+    }
+
+    private void initGame(GameMode m) {
+        game = new GameController(m);
+        game.startGame();
+    }
+
+    private void buildUI() {
+        setTitle("International Checkers");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setResizable(false);
+        getContentPane().setBackground(new java.awt.Color(0x1A1210));
+
+        boardPanel = new BoardPanel(game.getBoard());
+        sidePanel  = new SidePanel();
+
+        JPanel root = new JPanel(new BorderLayout(0, 0));
+        root.setBackground(new java.awt.Color(0x1A1210));
+        root.add(boardPanel, BorderLayout.CENTER);
+        root.add(sidePanel,  BorderLayout.EAST);
+
+        setContentPane(root);
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+
+        sidePanel.getResetButton().addActionListener(e -> resetGame());
+        sidePanel.getChangeModeButton().addActionListener(e -> changeMode());
+    }
+
+    private void setupInteraction() {
+        boardPanel.setClickListener(pos -> {
+            if (game.getGameState() != GameState.ONGOING) return;
+
+            if (mode == GameMode.PVE &&
+                    game.getCurrentPlayer().getColor() == pieces.Color.BLACK) return;
+
+            handleHumanClick(pos);
+        });
+    }
+
+    private void handleHumanClick(Position pos) {
+        Position forcedPos = game.getForcedPiece() != null
+            ? game.getForcedPiece().getPosition() : null;
+
+        if (forcedPos != null) {
+            selectedPos = forcedPos;
+            boardPanel.setSelectedPos(selectedPos);
+            boardPanel.setValidMovesForSelected(getValidMovesFromPos(selectedPos));
+        }
+
+        if (selectedPos == null) {
+            if (game.getBoard().getTile(pos).isOccupied() &&
+                    game.getBoard().getTile(pos).getPiece().getColor()
+                        == game.getCurrentPlayer().getColor()) {
+                selectedPos = pos;
+                boardPanel.setSelectedPos(selectedPos);
+                List<Move> validForPiece = getValidMovesFromPos(pos);
+                boardPanel.setValidMovesForSelected(validForPiece);
+                sidePanel.setMessage(validForPiece.isEmpty() ? "No legal moves for this piece." : " ");
+            }
+        } else if (pos.equals(selectedPos)) {
+            deselect();
+        } else if (game.getBoard().getTile(pos).isOccupied() &&
+                game.getBoard().getTile(pos).getPiece().getColor()
+                    == game.getCurrentPlayer().getColor() && forcedPos == null) {
+            selectedPos = pos;
+            boardPanel.setSelectedPos(pos);
+            boardPanel.setValidMovesForSelected(getValidMovesFromPos(pos));
+            sidePanel.setMessage(" ");
+        } else {
+            Move attempt = new Move(selectedPos, pos);
+            Position from = selectedPos;
+
+            game.applyMove(attempt);
+
+            boardPanel.setLastMovePath(from, pos);
+
+            String colorName = game.getCurrentPlayer() == null ? "?" :
+                (game.getGameState() == GameState.ONGOING
+                    ? (game.getCurrentPlayer().getColor() == pieces.Color.WHITE ? "BLACK" : "WHITE")
+                    : (game.getGameState() == GameState.WHITE_WIN ? "WHITE" : "BLACK"));
+            sidePanel.logMove(colorName, new Move(from, pos));
+
+            deselect();
+            refreshAll();
+
+            if (game.getForcedPiece() != null) {
+                selectedPos = game.getForcedPiece().getPosition();
+                boardPanel.setSelectedPos(selectedPos);
+                boardPanel.setValidMovesForSelected(getValidMovesFromPos(selectedPos));
+                boardPanel.setForcedPiecePos(selectedPos);
+                sidePanel.setMessage("⚡ Must capture again with same piece!");
+                boardPanel.refresh();
+                return;
+            }
+
+            if (game.getGameState() == GameState.ONGOING &&
+                    mode == GameMode.PVE &&
+                    game.getCurrentPlayer().getColor() == pieces.Color.BLACK) {
+                scheduleBotMove();
+            }
+        }
+
+        boardPanel.refresh();
+    }
+
+    private void scheduleBotMove() {
+        sidePanel.setMessage("🤖 Bot is thinking...");
+        Timer delay = new Timer(600, e -> {
+            if (game.getGameState() != GameState.ONGOING) return;
+            BotPlayer bot = (BotPlayer) game.getPlayerBlack();
+
+            while (game.getGameState() == GameState.ONGOING &&
+                   game.getCurrentPlayer().getColor() == pieces.Color.BLACK) {
+                Move move;
+                Position from;
+                if (game.getForcedPiece() != null) {
+                    from = game.getForcedPiece().getPosition();
+                    move = bot.makeForcedCapture(game.getBoard(), game.getForcedPiece());
+                } else {
+                    move = bot.makeMove(game.getBoard());
+                    from = move != null ? move.getStart() : null;
+                }
+
+                if (move == null) break;
+
+                boardPanel.setLastMovePath(from, move.getEnd());
+                sidePanel.logMove("BLACK", move);
+                game.applyMove(move);
+                refreshAll();
+
+                if (game.getForcedPiece() != null) {
+                    try { Thread.sleep(350); } catch (InterruptedException ex) { Thread.currentThread().interrupt(); }
+                } else {
+                    break;
+                }
+            }
+
+            sidePanel.setMessage(" ");
+            refreshAll();
+        });
+        delay.setRepeats(false);
+        delay.start();
+    }
+
+    private List<Move> getValidMovesFromPos(Position pos) {
+        List<Move> all = game.getRuleEngine().getValidMoves(game.getBoard(),
+            game.getCurrentPlayer().getColor());
+        return all.stream()
+            .filter(m -> m.getStart().equals(pos))
+            .collect(Collectors.toList());
+    }
+
+    private void deselect() {
+        selectedPos = null;
+        boardPanel.setSelectedPos(null);
+        boardPanel.setValidMovesForSelected(null);
+        boardPanel.setForcedPiecePos(null);
+        sidePanel.setMessage(" ");
+    }
+
+    private void refreshAll() {
+        boardPanel.setBoard(game.getBoard());
+        boardPanel.setForcedPiecePos(game.getForcedPiece() != null
+            ? game.getForcedPiece().getPosition() : null);
+        sidePanel.update(game);
+        boardPanel.refresh();
+
+        if (game.getGameState() == GameState.WHITE_WIN) {
+            sidePanel.setMessage("🏆 White wins the game!");
+        } else if (game.getGameState() == GameState.BLACK_WIN) {
+            sidePanel.setMessage("🏆 Black wins the game!");
+        }
+    }
+
+    private void resetGame() {
+        deselect();
+        game.resetGame();
+        boardPanel.setLastMovePath(null, null);
+        sidePanel.resetLog();
+        sidePanel.setMessage(" ");
+        refreshAll();
+    }
+
+    private void changeMode() {
+        dispose();
+        ModeDialog dialog = new ModeDialog(null);
+        dialog.setVisible(true);
+        GameMode chosen = dialog.getChosen();
+        if (chosen != null) {
+            new CheckersWindow(chosen);
+        }
+    }
 }
