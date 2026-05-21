@@ -25,7 +25,7 @@ public class RuleEngine {
     }
 
     public boolean hasMoreCaptures(Board board, Piece piece) {
-        List<Move> moreCaps = moveGenerator.getCaptureMovesForPiece(board, piece);
+        List<Move> moreCaps = piece.getCaptureMoves(board);
         return !moreCaps.isEmpty();
     }
 
@@ -36,9 +36,5 @@ public class RuleEngine {
 
         List<Move> opponentMoves = getValidMoves(board, opponentColor);
         return opponentMoves.isEmpty();
-    }
-
-    public Color getOpponentColor(Color color) {
-        return color.opponent();
     }
 }

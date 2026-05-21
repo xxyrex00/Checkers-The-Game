@@ -1,125 +1,32 @@
 import game.GameMode;
-import game.GameState;
-import game.core.GameController;
-import move.Move;
-import pieces.Color;
-import player.BotPlayer;
+import gui.CheckersWindow;
+import gui.dialogs.ModeDialog;
 
-import java.util.Scanner;
+import javax.swing.*;
 
 public class Main {
 
-    private static final Scanner scanner = new Scanner(System.in);
-
     public static void main(String[] args) {
-        System.out.println("=== International Checkers (10x10) ===\n");
-
-        GameMode selectedMode = selectGameMode();
-
-        GameController game = new GameController(selectedMode);
-        game.startGame();
-
-        if (selectedMode == GameMode.PVP) {
-            runPlayerVsPlayer(game);
-        } else {
-            runPlayerVsBot(game);
-        }
-
-        System.out.println("\nFinal state: " + game.getGameState());
-    }
-
-    private static GameMode selectGameMode() {
-        System.out.println("Select Game Mode:");
-        System.out.println("  1. Player vs Player");
-        System.out.println("  2. Player vs Bot");
-        System.out.print("Enter your choice (1 or 2): ");
-
-        while (true) {
-            String input = scanner.nextLine().trim();
-            switch (input) {
-                case "1":
-                    System.out.println("\nMode selected: Player vs Player\n");
-                    return GameMode.PVP;
-                case "2":
-                    System.out.println("\nMode selected: Player vs Bot\n");
-                    return GameMode.PVE;
-                default:
-                    System.out.print("Invalid choice. Please enter 1 or 2: ");
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+                UIManager.put("Panel.background",     gui.UIConstants.BG_DARK);
+                UIManager.put("OptionPane.background", gui.UIConstants.BG_DARK);
+                UIManager.put("Button.background",    gui.UIConstants.BG_BUTTON);
+                UIManager.put("Button.foreground",    gui.UIConstants.BUTTON_TEXT);
+            } catch (Exception e) {
+                System.err.println("Warning: Could not set look-and-feel: " + e.getMessage());
             }
-        }
-    }
 
-    private static void runPlayerVsPlayer(GameController game) {
-        while (game.getGameState() == GameState.ONGOING) {
-            if (game.getForcedPiece() != null) {
-                System.out.println("*** Forced continuation: you must capture again with the piece at " +
-                        game.getForcedPiece().getPosition() + " ***");
+            ModeDialog dialog = new ModeDialog(null);
+            dialog.setVisible(true);
+
+            GameMode chosen = dialog.getChosen();
+            if (chosen == null) {
+                System.exit(0);
             }
-            System.out.println("\n" + game.getCurrentPlayer().getName() + " (" +
-                    game.getCurrentPlayer().getColor() + ") – enter your move (e.g. 5,0-4,1): ");
 
-            String line = scanner.nextLine().trim();
-            Move move = parseMove(line);
-            if (move == null) {
-                System.out.println("Could not parse move. Use format: row,col-row,col");
-                continue;
-            }
-            game.applyMove(move);
-        }
-    }
-
-    private static void runPlayerVsBot(GameController game) {
-        BotPlayer bot = (BotPlayer) game.getPlayerBlack();
-
-        while (game.getGameState() == GameState.ONGOING) {
-            if (game.getCurrentPlayer().getColor() == Color.BLACK) {
-                Move move;
-                if (game.getForcedPiece() != null) {
-                    move = bot.makeForcedCapture(game.getBoard(), game.getForcedPiece());
-                    System.out.println("Bot forced capture with piece at " + game.getForcedPiece().getPosition());
-                } else {
-                    move = bot.makeMove(game.getBoard());
-                }
-
-                if (move == null) {
-                    System.out.println("Bot has no moves. Game over.");
-                    break;
-                }
-                System.out.println("\nBot (BLACK) plays: " + move);
-                game.applyMove(move);
-            } else {
-                if (game.getForcedPiece() != null) {
-                    System.out.println("*** Forced continuation: you must capture again with the piece at " +
-                            game.getForcedPiece().getPosition() + " ***");
-                }
-                System.out.println("\nPlayer 1 (WHITE) – enter your move (e.g. 5,0-4,1): ");
-                String line = scanner.nextLine().trim();
-                Move move = parseMove(line);
-                if (move == null) {
-                    System.out.println("Could not parse move. Use format: row,col-row,col");
-                    continue;
-                }
-                game.applyMove(move);
-            }
-        }
-    }
-
-    private static Move parseMove(String input) {
-        try {
-            String[] parts = input.split("-");
-            if (parts.length != 2) return null;
-            String[] from = parts[0].split(",");
-            String[] to = parts[1].split(",");
-            if (from.length != 2 || to.length != 2) return null;
-            int fromRow = Integer.parseInt(from[0].trim());
-            int fromCol = Integer.parseInt(from[1].trim());
-            int toRow = Integer.parseInt(to[0].trim());
-            int toCol = Integer.parseInt(to[1].trim());
-            board.Position start = new board.Position(fromRow, fromCol);
-            board.Position end = new board.Position(toRow, toCol);
-            return new move.Move(start, end);
-        } catch (NumberFormatException e) {
-            return null;
-        }
+            new CheckersWindow(chosen);
+        });
     }
 }
