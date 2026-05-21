@@ -19,19 +19,16 @@ public class Board {
         placeInitialPieces();
     }
 
-    // Initialize 10x10 board, mark playable (dark) squares
     private void initializeTiles() {
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
                 Position pos = new Position(row, col);
-                // Dark squares: sum of row+col is odd (international checkers convention)
                 boolean isPlayable = (row + col) % 2 != 0;
                 tiles[row][col] = new Tile(pos, isPlayable);
             }
         }
     }
 
-    // Place initial pieces: BLACK on rows 0-3, WHITE on rows 6-9 (dark squares only)
     private void placeInitialPieces() {
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
@@ -51,11 +48,6 @@ public class Board {
         return tiles[pos.getRow()][pos.getCol()];
     }
 
-    public Tile getTile(int row, int col) {
-        return tiles[row][col];
-    }
-
-    // Move a piece from start to end using a Move object
     public void movePiece(Move move) {
         Position start = move.getStart();
         Position end = move.getEnd();
@@ -68,7 +60,6 @@ public class Board {
         piece.setPosition(end);
         endTile.setPiece(piece);
 
-        // Remove captured pieces
         for (Position captured : move.getCapturedPieces()) {
             getTile(captured).removePiece();
         }
@@ -80,7 +71,6 @@ public class Board {
         return row >= 0 && row < SIZE && col >= 0 && col < SIZE;
     }
 
-    // Return all pieces belonging to a given player color
     public List<Piece> getPiecesOf(Color color) {
         List<Piece> pieces = new ArrayList<>();
         for (int row = 0; row < SIZE; row++) {
@@ -94,7 +84,6 @@ public class Board {
         return pieces;
     }
 
-    // Print board to console for testing
     public void printBoard() {
         System.out.println("  0 1 2 3 4 5 6 7 8 9");
         for (int row = 0; row < SIZE; row++) {
