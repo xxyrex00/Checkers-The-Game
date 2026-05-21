@@ -1,10 +1,8 @@
 package player;
 
-import board.Board;
-import move.Move;
 import pieces.Color;
 
-public abstract class Player {
+public class Player {
 
     private String name;
     private Color color;
@@ -21,6 +19,4 @@ public abstract class Player {
     public Color getColor() {
         return color;
     }
-
-    public abstract Move makeMove(Board board);
 }
