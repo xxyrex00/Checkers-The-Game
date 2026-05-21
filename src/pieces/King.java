@@ -14,7 +14,6 @@ public class King extends Piece {
         super(color, position);
     }
 
-    // King can fly diagonally any number of squares in all 4 directions
     @Override
     public List<Move> getPossibleMoves(Board board) {
         List<Move> moves = new ArrayList<>();
@@ -36,7 +35,6 @@ public class King extends Piece {
         return moves;
     }
 
-    // King long-range capture: fly over exactly one enemy piece, land on any empty square beyond
     @Override
     public List<Move> getCaptureMoves(Board board) {
         List<Move> captures = new ArrayList<>();
@@ -53,11 +51,10 @@ public class King extends Piece {
                 Tile tile = board.getTile(curr);
 
                 if (tile.isOccupied()) {
-                    if (tile.getPiece().getColor() == getColor()) break; // own piece blocks
-                    if (enemyPos != null) break; // second enemy piece, can't jump two
+                    if (tile.getPiece().getColor() == getColor()) break;
+                    if (enemyPos != null) break;
                     enemyPos = curr;
                 } else if (enemyPos != null) {
-                    // Empty square after enemy: valid landing spot
                     List<Position> captured = new ArrayList<>();
                     captured.add(enemyPos);
                     captures.add(new Move(getPosition(), curr, captured));

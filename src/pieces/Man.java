@@ -13,8 +13,6 @@ public class Man extends Piece {
         super(color, position);
     }
 
-    // Forward diagonal movement (WHITE moves up = decreasing row, BLACK moves down = increasing row)
-    // International rules allow backward captures, but forward-only normal moves
     @Override
     public List<Move> getPossibleMoves(Board board) {
         List<Move> moves = new ArrayList<>();
@@ -32,7 +30,6 @@ public class Man extends Piece {
         return moves;
     }
 
-    // International rules: captures allowed in all 4 diagonal directions
     @Override
     public List<Move> getCaptureMoves(Board board) {
         List<Move> captures = new ArrayList<>();
@@ -56,7 +53,6 @@ public class Man extends Piece {
         return captures;
     }
 
-    // Check if this Man should be promoted (reaches the opposite back row)
     public boolean shouldPromote() {
         int row = getPosition().getRow();
         return (getColor() == Color.WHITE && row == 0) ||

@@ -28,9 +28,7 @@ public abstract class Piece {
         this.position = position;
     }
 
-    // Returns all possible non-capture moves
     public abstract List<Move> getPossibleMoves(Board board);
 
-    // Returns all capture moves
     public abstract List<Move> getCaptureMoves(Board board);
 }
