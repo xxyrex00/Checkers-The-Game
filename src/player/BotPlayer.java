@@ -34,7 +34,7 @@ public class BotPlayer extends Player {
     }
 
     public Move makeForcedCapture(Board board, pieces.Piece forcedPiece) {
-        List<Move> forcedCaps = moveGenerator.getCaptureMovesForPiece(board, forcedPiece);
+        List<Move> forcedCaps = forcedPiece.getCaptureMoves(board);
         if (!forcedCaps.isEmpty()) {
             return pickRandom(forcedCaps);
         }
