@@ -12,7 +12,6 @@ import pieces.King;
 import pieces.Man;
 import pieces.Piece;
 import player.Player;
-import player.HumanPlayer;
 import player.BotPlayer;
 
 public class GameController {
@@ -34,11 +33,11 @@ public class GameController {
         this.gameState = GameState.ONGOING;
         this.forcedPiece = null;
 
-        playerWhite = new HumanPlayer("Player 1", Color.WHITE);
+        playerWhite = new Player("Player 1", Color.WHITE);
         if (gameMode == GameMode.PVP) {
-            playerBlack = new HumanPlayer("Player 2", Color.BLACK);
+            playerBlack = new Player("Player 2", Color.BLACK);
         } else {
-            playerBlack = new BotPlayer("Bot", Color.BLACK);
+            playerBlack = new BotPlayer("Bot", Color.BLACK, ruleEngine);
         }
         currentPlayer = playerWhite;
     }
@@ -68,12 +67,12 @@ public class GameController {
         board.movePiece(fullMove);
         Piece pieceAtEnd = board.getTile(fullMove.getEnd()).getPiece();
 
+        pieceAtEnd = promoteIfEligible(pieceAtEnd);
+
         if (fullMove.isCaptureMove() && ruleEngine.hasMoreCaptures(board, pieceAtEnd)) {
             forcedPiece = pieceAtEnd;
             return;
         }
-
-        pieceAtEnd = promoteIfEligible(pieceAtEnd);
 
         if (ruleEngine.checkWinCondition(board, currentPlayer.getColor())) {
             gameState = currentPlayer.getColor() == Color.WHITE ? GameState.WHITE_WIN : GameState.BLACK_WIN;
