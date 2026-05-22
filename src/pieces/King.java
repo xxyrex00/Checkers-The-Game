@@ -7,6 +7,7 @@ import move.Move;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class King extends Piece {
 
@@ -24,9 +25,9 @@ public class King extends Piece {
             int col = getPosition().getCol() + d[1];
             while (true) {
                 Position dest = new Position(row, col);
-                if (!board.isWithinBounds(dest)) break;
+                if (!board.isPlayable(dest)) break;
                 Tile tile = board.getTile(dest);
-                if (tile.isOccupied()) break; // blocked
+                if (tile.isOccupied()) break;
                 moves.add(new Move(getPosition(), dest));
                 row += d[0];
                 col += d[1];
@@ -36,7 +37,7 @@ public class King extends Piece {
     }
 
     @Override
-    public List<Move> getCaptureMoves(Board board) {
+    public List<Move> getCaptureMoves(Board board, Set<Position> excluded) {
         List<Move> captures = new ArrayList<>();
         int[][] directions = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
 
@@ -53,11 +54,14 @@ public class King extends Piece {
                 if (tile.isOccupied()) {
                     if (tile.getPiece().getColor() == getColor()) break;
                     if (enemyPos != null) break;
+                    if (excluded.contains(curr)) break;
                     enemyPos = curr;
                 } else if (enemyPos != null) {
-                    List<Position> captured = new ArrayList<>();
-                    captured.add(enemyPos);
-                    captures.add(new Move(getPosition(), curr, captured));
+                    if (board.isPlayable(curr)) {
+                        List<Position> newCaptured = new ArrayList<>(excluded);
+                        newCaptured.add(enemyPos);
+                        captures.add(new Move(getPosition(), curr, newCaptured));
+                    }
                 }
                 row += d[0];
                 col += d[1];
@@ -66,4 +70,3 @@ public class King extends Piece {
         return captures;
     }
 }
-
