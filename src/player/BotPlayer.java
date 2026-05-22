@@ -7,6 +7,7 @@ import pieces.Color;
 
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class BotPlayer extends Player {
 
@@ -28,9 +29,12 @@ public class BotPlayer extends Player {
     }
 
     public Move makeForcedCapture(Board board, pieces.Piece forcedPiece) {
-        List<Move> forcedCaps = forcedPiece.getCaptureMoves(board);
-        if (!forcedCaps.isEmpty()) {
-            return pickRandom(forcedCaps);
+        List<Move> caps = ruleEngine.getValidMoves(board, getColor())
+            .stream()
+            .filter(m -> m.getStart().equals(forcedPiece.getPosition()))
+            .collect(Collectors.toList());
+        if (!caps.isEmpty()) {
+            return pickRandom(caps);
         }
         return null;
     }

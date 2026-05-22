@@ -104,8 +104,10 @@ public class CheckersWindow extends JFrame {
             Move attempt = new Move(selectedPos, pos);
             Position from = selectedPos;
 
+            // Capture the moving player's color BEFORE applyMove switches the turn
             pieces.Color movingColor = game.getCurrentPlayer().getColor();
 
+            // Only log the move if applyMove actually accepted it
             boolean accepted = game.applyMove(attempt);
 
             if (accepted) {
@@ -139,41 +141,46 @@ public class CheckersWindow extends JFrame {
 
     private void scheduleBotMove() {
         sidePanel.setMessage("🤖 Bot is thinking...");
-        Timer delay = new Timer(600, e -> {
-            if (game.getGameState() != GameState.ONGOING) return;
-            BotPlayer bot = (BotPlayer) game.getPlayerBlack();
-
-            while (game.getGameState() == GameState.ONGOING &&
-                   game.getCurrentPlayer().getColor() == pieces.Color.BLACK) {
-                Move move;
-                Position from;
-                if (game.getForcedPiece() != null) {
-                    from = game.getForcedPiece().getPosition();
-                    move = bot.makeForcedCapture(game.getBoard(), game.getForcedPiece());
-                } else {
-                    move = bot.makeMove(game.getBoard());
-                    from = move != null ? move.getStart() : null;
-                }
-
-                if (move == null) break;
-
-                boardPanel.setLastMovePath(from, move.getEnd());
-                game.applyMove(move);
-                sidePanel.logMove("BLACK", move);
-                refreshAll();
-
-                if (game.getForcedPiece() != null) {
-                    break;
-                } else {
-                    break;
-                }
-            }
-
-            sidePanel.setMessage(" ");
-            refreshAll();
-        });
+        Timer delay = new Timer(600, e -> executeBotStep());
         delay.setRepeats(false);
         delay.start();
+    }
+
+    private void executeBotStep() {
+        if (game.getGameState() != GameState.ONGOING) return;
+        if (game.getCurrentPlayer().getColor() != pieces.Color.BLACK) return;
+
+        BotPlayer bot = (BotPlayer) game.getPlayerBlack();
+        Move move;
+        Position from;
+
+        if (game.getForcedPiece() != null) {
+            from = game.getForcedPiece().getPosition();
+            move = bot.makeForcedCapture(game.getBoard(), game.getForcedPiece());
+        } else {
+            move = bot.makeMove(game.getBoard());
+            from = move != null ? move.getStart() : null;
+        }
+
+        if (move == null) {
+            sidePanel.setMessage(" ");
+            return;
+        }
+
+        boardPanel.setLastMovePath(from, move.getEnd());
+        game.applyMove(move);
+        sidePanel.logMove("BLACK", move);
+        refreshAll();
+
+        if (game.getForcedPiece() != null) {
+            // More captures required — schedule the next step so the UI repaints
+            // between each jump instead of freezing on the EDT
+            Timer next = new Timer(400, e -> executeBotStep());
+            next.setRepeats(false);
+            next.start();
+        } else {
+            sidePanel.setMessage(" ");
+        }
     }
 
     private List<Move> getValidMovesFromPos(Position pos) {
