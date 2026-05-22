@@ -1,12 +1,16 @@
 package game.rules;
 
 import board.Board;
+import board.Position;
 import move.Move;
 import move.MoveGenerator;
 import pieces.Color;
 import pieces.Piece;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class RuleEngine {
 
@@ -24,9 +28,14 @@ public class RuleEngine {
         return moveGenerator.getAllMoves(board, playerColor);
     }
 
-    public boolean hasMoreCaptures(Board board, Piece piece) {
-        List<Move> moreCaps = piece.getCaptureMoves(board);
+    public boolean hasMoreCaptures(Board board, Piece piece, List<Position> alreadyCaptured) {
+        Set<Position> excluded = new HashSet<>(alreadyCaptured);
+        List<Move> moreCaps = piece.getCaptureMoves(board, excluded);
         return !moreCaps.isEmpty();
+    }
+
+    public boolean hasMoreCaptures(Board board, Piece piece) {
+        return hasMoreCaptures(board, piece, Collections.emptyList());
     }
 
     public boolean checkWinCondition(Board board, Color currentPlayerColor) {
