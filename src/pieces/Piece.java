@@ -5,6 +5,8 @@ import board.Position;
 import move.Move;
 
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 public abstract class Piece {
 
@@ -30,5 +32,9 @@ public abstract class Piece {
 
     public abstract List<Move> getPossibleMoves(Board board);
 
-    public abstract List<Move> getCaptureMoves(Board board);
+    public abstract List<Move> getCaptureMoves(Board board, Set<Position> excluded);
+
+    public List<Move> getCaptureMoves(Board board) {
+        return getCaptureMoves(board, new HashSet<>());
+    }
 }
