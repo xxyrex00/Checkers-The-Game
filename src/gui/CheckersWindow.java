@@ -104,16 +104,16 @@ public class CheckersWindow extends JFrame {
             Move attempt = new Move(selectedPos, pos);
             Position from = selectedPos;
 
-            game.applyMove(attempt);
+            pieces.Color movingColor = game.getCurrentPlayer().getColor();
+
+            boolean accepted = game.applyMove(attempt);
+
+            if (accepted) {
+                String colorName = movingColor == pieces.Color.WHITE ? "WHITE" : "BLACK";
+                sidePanel.logMove(colorName, new Move(from, pos));
+            }
 
             boardPanel.setLastMovePath(from, pos);
-
-            String colorName = game.getCurrentPlayer() == null ? "?" :
-                (game.getGameState() == GameState.ONGOING
-                    ? (game.getCurrentPlayer().getColor() == pieces.Color.WHITE ? "BLACK" : "WHITE")
-                    : (game.getGameState() == GameState.WHITE_WIN ? "WHITE" : "BLACK"));
-            sidePanel.logMove(colorName, new Move(from, pos));
-
             deselect();
             refreshAll();
 
@@ -158,12 +158,12 @@ public class CheckersWindow extends JFrame {
                 if (move == null) break;
 
                 boardPanel.setLastMovePath(from, move.getEnd());
-                sidePanel.logMove("BLACK", move);
                 game.applyMove(move);
+                sidePanel.logMove("BLACK", move);
                 refreshAll();
 
                 if (game.getForcedPiece() != null) {
-                    try { Thread.sleep(350); } catch (InterruptedException ex) { Thread.currentThread().interrupt(); }
+                    break;
                 } else {
                     break;
                 }
