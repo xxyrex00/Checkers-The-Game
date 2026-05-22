@@ -51,49 +51,44 @@ public class GameController {
         forcedPiece = null;
     }
 
-    public void applyMove(Move attemptedMove) {
-        if (attemptedMove == null) {
-            return;
-        }
-        if (forcedPiece != null && !attemptedMove.getStart().equals(forcedPiece.getPosition())) {
-            return;
-        }
+    public boolean applyMove(Move attemptedMove) {
+        if (attemptedMove == null) return false;
+        if (forcedPiece != null && !attemptedMove.getStart().equals(forcedPiece.getPosition()))
+            return false;
 
         Move fullMove = moveValidator.validateMove(board, attemptedMove, currentPlayer.getColor());
-        if (fullMove == null) {
-            return;
-        }
+        if (fullMove == null) return false;
 
         board.movePiece(fullMove);
         Piece pieceAtEnd = board.getTile(fullMove.getEnd()).getPiece();
 
-        pieceAtEnd = promoteIfEligible(pieceAtEnd);
-
-        if (fullMove.isCaptureMove() && ruleEngine.hasMoreCaptures(board, pieceAtEnd)) {
-            forcedPiece = pieceAtEnd;
-            return;
-        }
-
-        if (ruleEngine.checkWinCondition(board, currentPlayer.getColor())) {
-            gameState = currentPlayer.getColor() == Color.WHITE ? GameState.WHITE_WIN : GameState.BLACK_WIN;
-            return;
-        }
-
-        forcedPiece = null;
-        switchTurn();
-    }
-
-    private Piece promoteIfEligible(Piece piece) {
-        if (piece instanceof Man) {
-            Man man = (Man) piece;
+        boolean promoted = false;
+        if (pieceAtEnd instanceof Man) {
+            Man man = (Man) pieceAtEnd;
             if (man.shouldPromote()) {
                 Position pos = man.getPosition();
                 King king = new King(man.getColor(), pos);
                 board.getTile(pos).setPiece(king);
-                return king;
+                pieceAtEnd = king;
+                promoted = true;
             }
         }
-        return piece;
+
+        if (fullMove.isCaptureMove() && !promoted
+                && ruleEngine.hasMoreCaptures(board, pieceAtEnd, fullMove.getCapturedPieces())) {
+            forcedPiece = pieceAtEnd;
+            return true;
+        }
+
+        if (ruleEngine.checkWinCondition(board, currentPlayer.getColor())) {
+            gameState = currentPlayer.getColor() == Color.WHITE
+                ? GameState.WHITE_WIN : GameState.BLACK_WIN;
+            return true;
+        }
+
+        forcedPiece = null;
+        switchTurn();
+        return true;
     }
 
     public void resetGame() {
