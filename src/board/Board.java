@@ -56,6 +56,7 @@ public class Board {
         Tile endTile = getTile(end);
 
         Piece piece = startTile.getPiece();
+        if (piece == null) return;
         startTile.removePiece();
         piece.setPosition(end);
         endTile.setPiece(piece);
@@ -69,6 +70,10 @@ public class Board {
         int row = pos.getRow();
         int col = pos.getCol();
         return row >= 0 && row < SIZE && col >= 0 && col < SIZE;
+    }
+
+    public boolean isPlayable(Position pos) {
+        return isWithinBounds(pos) && tiles[pos.getRow()][pos.getCol()].isPlayable();
     }
 
     public List<Piece> getPiecesOf(Color color) {
